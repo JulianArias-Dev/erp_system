@@ -4,13 +4,14 @@ CREATE DATABASE erp_system;
 -- Cambiar a la base de datos
 \c erp_system;
 
--- Tabla: Products
+-- Crear la tabla Products con la columna 'code'
 CREATE TABLE Products (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    unit_price NUMERIC(10, 2) NOT NULL,
-    available_units INT NOT NULL,
-    max_capacity INT NOT NULL
+    code VARCHAR(50) UNIQUE NOT NULL, 
+    name VARCHAR(255) NOT NULL,       
+    unit_price NUMERIC(10, 2) NOT NULL, 
+    available_units INT NOT NULL,     
+    max_capacity INT NOT NULL         
 );
 
 -- Tabla: Ingredients
@@ -107,3 +108,14 @@ CREATE TABLE Available_ProductionLines (
     PRIMARY KEY (fk_production),
     FOREIGN KEY (fk_production) REFERENCES ProductionLines (id) ON DELETE CASCADE
 );
+
+
+-- Insertar datos de muestra
+INSERT INTO Products (code, name, unit_price, available_units, max_capacity)
+VALUES
+    ('LIM001', 'Limonada 350ml', 25.50, 100, 200),
+    ('LIM002', 'Limonada 250ml', 15.75, 50, 150),
+    ('LIM003', 'Limonada 500ml', 45.00, 20, 100);
+
+select * from products
+Delete from products
