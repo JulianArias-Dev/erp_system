@@ -1,0 +1,109 @@
+-- Crear la base de datos
+CREATE DATABASE erp_system;
+
+-- Cambiar a la base de datos
+\c erp_system;
+
+-- Tabla: Products
+CREATE TABLE Products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    unit_price NUMERIC(10, 2) NOT NULL,
+    available_units INT NOT NULL,
+    max_capacity INT NOT NULL
+);
+
+-- Tabla: Ingredients
+CREATE TABLE Ingredients (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    available_units INT NOT NULL,
+    max_capacity INT NOT NULL
+);
+
+-- Tabla: Recipes
+CREATE TABLE Recipes (
+    id SERIAL PRIMARY KEY,
+    fk_product INT NOT NULL,
+    expiration_time INT NOT NULL,
+    FOREIGN KEY (fk_product) REFERENCES Products (id) ON DELETE CASCADE
+);
+
+-- Tabla: Ingredient_Recipe (Relación N:M entre Ingredients y Recipes)
+CREATE TABLE Ingredient_Recipe (
+    fk_ingredient INT NOT NULL,
+    fk_recipe INT NOT NULL,
+    quantity INT NOT NULL,
+    PRIMARY KEY (fk_ingredient, fk_recipe),
+    FOREIGN KEY (fk_ingredient) REFERENCES Ingredients (id) ON DELETE CASCADE,
+    FOREIGN KEY (fk_recipe) REFERENCES Recipes (id) ON DELETE CASCADE
+);
+
+-- Tabla: Suppliers
+CREATE TABLE Suppliers (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL
+);
+
+-- Tabla: Supplier_Ingredient (Relación N:M entre Suppliers e Ingredients)
+CREATE TABLE Supplier_Ingredient (
+    fk_ingredient INT NOT NULL,
+    fk_supplier INT NOT NULL,
+    delivery_time INT NOT NULL,
+    quantity INT NOT NULL,
+    price NUMERIC(10, 2) NOT NULL,
+    PRIMARY KEY (fk_ingredient, fk_supplier),
+    FOREIGN KEY (fk_ingredient) REFERENCES Ingredients (id) ON DELETE CASCADE,
+    FOREIGN KEY (fk_supplier) REFERENCES Suppliers (id) ON DELETE CASCADE
+);
+
+-- Tabla: ProductionLines
+CREATE TABLE ProductionLines (
+    id SERIAL PRIMARY KEY,
+    fk_product INT NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    FOREIGN KEY (fk_product) REFERENCES Products (id) ON DELETE CASCADE
+);
+
+-- Tabla: Supplier_Production (Relación N:M entre Suppliers y ProductionLines)
+CREATE TABLE Supplier_Production (
+    fk_production INT NOT NULL,
+    fk_supplier INT NOT NULL,
+    delivery_time INT NOT NULL,
+    price NUMERIC(10, 2) NOT NULL,
+    PRIMARY KEY (fk_production, fk_supplier),
+    FOREIGN KEY (fk_production) REFERENCES ProductionLines (id) ON DELETE CASCADE,
+    FOREIGN KEY (fk_supplier) REFERENCES Suppliers (id) ON DELETE CASCADE
+);
+
+-- Tabla: Orders
+CREATE TABLE Orders (
+    id SERIAL PRIMARY KEY,
+    customer VARCHAR(255) NOT NULL,
+    order_date DATE NOT NULL,
+    delivery_date DATE NOT NULL,
+    estimated_time DATE NOT NULL,
+    status INT NOT NULL
+);
+
+-- Tabla: Order_Product (Relación N:M entre Orders y Products)
+CREATE TABLE Order_Product (
+    fk_product INT NOT NULL,
+    fk_order INT NOT NULL,
+    quantity INT NOT NULL,
+    PRIMARY KEY (fk_product, fk_order),
+    FOREIGN KEY (fk_product) REFERENCES Products (id) ON DELETE CASCADE,
+    FOREIGN KEY (fk_order) REFERENCES Orders (id) ON DELETE CASCADE
+);
+
+-- Tabla: Available_ProductionLines
+CREATE TABLE Available_ProductionLines (
+    fk_production INT NOT NULL,
+    estimated_quantity INT NOT NULL,
+    estimated_time INT NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    sale_price NUMERIC(10, 2) NOT NULL,
+    PRIMARY KEY (fk_production),
+    FOREIGN KEY (fk_production) REFERENCES ProductionLines (id) ON DELETE CASCADE
+);

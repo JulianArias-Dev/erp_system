@@ -1,0 +1,53 @@
+# Python
+*.py[cod]           # Archivos compilados de Python
+__pycache__/         # Caché de Python
+*.so                 # Archivos de extensiones compiladas
+
+# Entornos virtuales
+venv/                # Directorio común para entornos virtuales
+.env/                # Otros directorios de entornos virtuales
+env/                
+*.env                # Archivos de variables de entorno
+
+# Archivos de configuración específicos del sistema
+*.DS_Store           # macOS
+Thumbs.db            # Windows
+.idea/               # Configuración de IDEs como PyCharm
+.vscode/             # Configuración de Visual Studio Code
+*.log                # Archivos de logs
+*.sqlite3            # Bases de datos SQLite locales
+
+# Archivos de dependencias y compilación
+build/
+dist/
+*.egg-info/
+pip-log.txt          # Logs de instalación de pip
+
+# Docker
+*.pid                # Archivos de procesos
+docker-compose.override.yml  # Archivos de configuración locales de Docker
+
+# Node.js (si usas frontend en tu proyecto)
+node_modules/        # Dependencias de Node.js
+npm-debug.log        # Logs de depuración de npm
+yarn-debug.log       # Logs de depuración de Yarn
+yarn-error.log       # Logs de errores de Yarn
+
+# Migrations
+migrations/          # Migraciones de bases de datos (usa un directorio separado y hazlo explícito si necesitas mantener algunos)
+
+# Tests
+.pytest_cache/       # Caché de pytest
+htmlcov/             # Informes de cobertura de pruebas en HTML
+.coverage            # Archivo de cobertura de pruebas
+
+# Documentación
+*.docx               # Documentos Word
+*.pdf                # Documentos PDF generados
+*.rst                # Documentos reStructuredText
+*.tex                # Archivos LaTeX generados
+
+# Archivos sensibles personalizados
+keys/                # Llaves y credenciales personalizadas
+secrets/             # Directorios que contengan credenciales o datos sensibles
+.cert/               # Archivos de certificados
