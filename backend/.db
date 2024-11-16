@@ -1,121 +1,204 @@
 -- Crear la base de datos
-CREATE DATABASE erp_system;
+-- CREATE DATABASE erp_system;
 
--- Cambiar a la base de datos
-\c erp_system;
-
--- Crear la tabla Products con la columna 'code'
+-- Tables
+-- Crear tabla Products
 CREATE TABLE Products (
     id SERIAL PRIMARY KEY,
-    code VARCHAR(50) UNIQUE NOT NULL, 
-    name VARCHAR(255) NOT NULL,       
-    unit_price NUMERIC(10, 2) NOT NULL, 
-    available_units INT NOT NULL,     
-    max_capacity INT NOT NULL         
+    Name VARCHAR(255) NOT NULL,
+    Code VARCHAR(100) NOT NULL UNIQUE,
+    Unit_Price FLOAT NOT NULL,
+    Available_Units INTEGER NOT NULL,
+    Max_Capacity INTEGER NOT NULL
 );
 
--- Tabla: Ingredients
+-- Crear tabla Ingredients
 CREATE TABLE Ingredients (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    available_units INT NOT NULL,
-    max_capacity INT NOT NULL
+    Name VARCHAR(255) NOT NULL,
+    Code VARCHAR(100) NOT NULL UNIQUE,
+    Available_Units FLOAT NOT NULL,
+    Max_Capacity FLOAT NOT NULL,
+    Type VARCHAR(50) NOT NULL,
+    CONSTRAINT chk_type CHECK (Type IN ('Solido', 'Liquido', 'Envase'))
 );
 
--- Tabla: Recipes
-CREATE TABLE Recipes (
+-- Crear tabla Supplier
+CREATE TABLE Supplier (
     id SERIAL PRIMARY KEY,
-    fk_product INT NOT NULL,
-    expiration_time INT NOT NULL,
-    FOREIGN KEY (fk_product) REFERENCES Products (id) ON DELETE CASCADE
+    Name VARCHAR(255) NOT NULL,
+    Contact VARCHAR(255) NOT NULL
 );
 
--- Tabla: Ingredient_Recipe (Relación N:M entre Ingredients y Recipes)
-CREATE TABLE Ingredient_Recipe (
-    fk_ingredient INT NOT NULL,
-    fk_recipe INT NOT NULL,
-    quantity INT NOT NULL,
-    PRIMARY KEY (fk_ingredient, fk_recipe),
-    FOREIGN KEY (fk_ingredient) REFERENCES Ingredients (id) ON DELETE CASCADE,
-    FOREIGN KEY (fk_recipe) REFERENCES Recipes (id) ON DELETE CASCADE
-);
-
--- Tabla: Suppliers
-CREATE TABLE Suppliers (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    location VARCHAR(255) NOT NULL
-);
-
--- Tabla: Supplier_Ingredient (Relación N:M entre Suppliers e Ingredients)
+-- Crear tabla Supplier_Ingredient (relación muchos a muchos)
 CREATE TABLE Supplier_Ingredient (
-    fk_ingredient INT NOT NULL,
-    fk_supplier INT NOT NULL,
-    delivery_time INT NOT NULL,
-    quantity INT NOT NULL,
-    price NUMERIC(10, 2) NOT NULL,
-    PRIMARY KEY (fk_ingredient, fk_supplier),
-    FOREIGN KEY (fk_ingredient) REFERENCES Ingredients (id) ON DELETE CASCADE,
-    FOREIGN KEY (fk_supplier) REFERENCES Suppliers (id) ON DELETE CASCADE
+    FK_Supplier INTEGER NOT NULL REFERENCES Supplier(id) ON DELETE CASCADE,
+    FK_Ingredient INTEGER NOT NULL REFERENCES Ingredients(id) ON DELETE CASCADE,
+    Quantity INTEGER NOT NULL,
+    Price FLOAT NOT NULL,
+    PRIMARY KEY (FK_Supplier, FK_Ingredient)
 );
 
--- Tabla: ProductionLines
-CREATE TABLE ProductionLines (
+-- Crear tabla Recipe
+CREATE TABLE Recipe (
     id SERIAL PRIMARY KEY,
-    fk_product INT NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    FOREIGN KEY (fk_product) REFERENCES Products (id) ON DELETE CASCADE
+    FK_Product INTEGER NOT NULL REFERENCES Products(id) ON DELETE CASCADE,
+    Preparation_Time INTEGER NOT NULL
 );
 
--- Tabla: Supplier_Production (Relación N:M entre Suppliers y ProductionLines)
-CREATE TABLE Supplier_Production (
-    fk_production INT NOT NULL,
-    fk_supplier INT NOT NULL,
-    delivery_time INT NOT NULL,
-    price NUMERIC(10, 2) NOT NULL,
-    PRIMARY KEY (fk_production, fk_supplier),
-    FOREIGN KEY (fk_production) REFERENCES ProductionLines (id) ON DELETE CASCADE,
-    FOREIGN KEY (fk_supplier) REFERENCES Suppliers (id) ON DELETE CASCADE
+-- Crear tabla Recipe_Ingredients (relación muchos a muchos)
+CREATE TABLE Recipe_Ingredients (
+    FK_Ingredient INTEGER NOT NULL REFERENCES Ingredients(id) ON DELETE CASCADE,
+    FK_Recipe INTEGER NOT NULL REFERENCES Recipe(id) ON DELETE CASCADE,
+    Quantity FLOAT NOT NULL,
+    PRIMARY KEY (FK_Ingredient, FK_Recipe)
 );
 
--- Tabla: Orders
-CREATE TABLE Orders (
+-- Crear tabla Production_Line
+CREATE TABLE Production_Line (
     id SERIAL PRIMARY KEY,
-    customer VARCHAR(255) NOT NULL,
-    order_date DATE NOT NULL,
-    delivery_date DATE NOT NULL,
-    estimated_time DATE NOT NULL,
-    status INT NOT NULL
+    Liquid_Capacity FLOAT NOT NULL,
+    Solid_Capacity FLOAT NOT NULL,
+    Production_Factor FLOAT NOT NULL
 );
 
--- Tabla: Order_Product (Relación N:M entre Orders y Products)
-CREATE TABLE Order_Product (
-    fk_product INT NOT NULL,
-    fk_order INT NOT NULL,
-    quantity INT NOT NULL,
-    PRIMARY KEY (fk_product, fk_order),
-    FOREIGN KEY (fk_product) REFERENCES Products (id) ON DELETE CASCADE,
-    FOREIGN KEY (fk_order) REFERENCES Orders (id) ON DELETE CASCADE
+-- Crear tabla Workers
+CREATE TABLE Workers (
+    id SERIAL PRIMARY KEY,
+    Name VARCHAR(255) NOT NULL,
+    UID VARCHAR(100) NOT NULL UNIQUE,
+    FK_Production_Line INTEGER NOT NULL REFERENCES Production_Line(id) ON DELETE SET NULL
 );
 
--- Tabla: Available_ProductionLines
-CREATE TABLE Available_ProductionLines (
-    fk_production INT NOT NULL,
-    estimated_quantity INT NOT NULL,
-    estimated_time INT NOT NULL,
-    status VARCHAR(255) NOT NULL,
-    sale_price NUMERIC(10, 2) NOT NULL,
-    PRIMARY KEY (fk_production),
-    FOREIGN KEY (fk_production) REFERENCES ProductionLines (id) ON DELETE CASCADE
-);
+--Triggers and Functions
+-- Crear función para reducir el Production_Factor al insertar un trabajador
+CREATE OR REPLACE FUNCTION reduce_production_factor()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Verifica si el trabajador está asociado a una línea de producción
+    IF NEW.FK_Production_Line IS NOT NULL THEN
+        UPDATE Production_Line
+        SET Production_Factor = Production_Factor - 0.1
+        WHERE id = NEW.FK_Production_Line;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+-- Crear función para incrementar el Production_Factor al eliminar un trabajador
+CREATE OR REPLACE FUNCTION increase_production_factor()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Verifica si el trabajador estaba asociado a una línea de producción
+    IF OLD.FK_Production_Line IS NOT NULL THEN
+        UPDATE Production_Line
+        SET Production_Factor = Production_Factor + 0.1
+        WHERE id = OLD.FK_Production_Line;
+    END IF;
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
 
--- Insertar datos de muestra
-INSERT INTO Products (code, name, unit_price, available_units, max_capacity)
+-- Crear trigger para reducir Production_Factor en la inserción
+CREATE TRIGGER after_worker_insert
+AFTER INSERT ON Workers
+FOR EACH ROW
+EXECUTE FUNCTION reduce_production_factor();
+
+-- Crear trigger para incrementar Production_Factor en la eliminación
+CREATE TRIGGER after_worker_delete
+AFTER DELETE ON Workers
+FOR EACH ROW
+EXECUTE FUNCTION increase_production_factor();
+
+-- Crear función para validar que no haya más de 5 trabajadores por línea de producción
+CREATE OR REPLACE FUNCTION validate_worker_limit()
+RETURNS TRIGGER AS $$
+DECLARE
+    worker_count INTEGER;
+BEGIN
+    -- Verificar si el trabajador está asociado a una línea de producción
+    IF NEW.FK_Production_Line IS NOT NULL THEN
+        -- Contar los trabajadores actuales en la línea de producción
+        SELECT COUNT(*) INTO worker_count
+        FROM Workers
+        WHERE FK_Production_Line = NEW.FK_Production_Line;
+
+        -- Si ya hay 5 trabajadores, rechazar la operación
+        IF worker_count >= 5 THEN
+            RAISE EXCEPTION 'No se pueden asignar más de 5 trabajadores a la línea de producción con id %', NEW.FK_Production_Line;
+        END IF;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Crear trigger para validar límite de trabajadores en la inserción
+CREATE TRIGGER validate_worker_limit_trigger
+BEFORE INSERT ON Workers
+FOR EACH ROW
+EXECUTE FUNCTION validate_worker_limit();
+
+-- Test Data
+-- Insertar datos en Products
+INSERT INTO Products (Name, Code, Unit_Price, Available_Units, Max_Capacity)
 VALUES
-    ('LIM001', 'Limonada 350ml', 25.50, 100, 200),
-    ('LIM002', 'Limonada 250ml', 15.75, 50, 150),
-    ('LIM003', 'Limonada 500ml', 45.00, 20, 100);
+('Producto A', 'P001', 10.5, 100, 500),
+('Producto B', 'P002', 15.0, 200, 600),
+('Producto C', 'P003', 8.75, 50, 300);
 
-select * from products
-Delete from products
+-- Insertar datos en Ingredients
+INSERT INTO Ingredients (Name, Code, Available_Units, Max_Capacity, Type)
+VALUES
+('Ingrediente X', 'I001', 1000, 5000, 'Líquido'),
+('Ingrediente Y', 'I002', 800, 4000, 'Sólido'),
+('Ingrediente Z', 'I003', 1500, 7000, 'Líquido');
+
+-- Insertar datos en Supplier
+INSERT INTO Supplier (Name, Contact)
+VALUES
+('Proveedor A', 'proveedora@example.com'),
+('Proveedor B', 'proveedorb@example.com'),
+('Proveedor C', 'proveedorc@example.com');
+
+-- Insertar datos en Supplier_Ingredient
+INSERT INTO Supplier_Ingredient (FK_Supplier, FK_Ingredient, Quantity, Price)
+VALUES
+(1, 1, 500, 1.2),
+(1, 2, 300, 2.0),
+(2, 3, 700, 1.5),
+(3, 1, 400, 1.1);
+
+-- Insertar datos en Recipe
+INSERT INTO Recipe (FK_Product, Preparation_Time)
+VALUES
+(1, 60),
+(2, 45),
+(3, 30);
+
+-- Insertar datos en Recipe_Ingredients
+INSERT INTO Recipe_Ingredients (FK_Ingredient, FK_Recipe, Quantity)
+VALUES
+(1, 1, 2.5),
+(2, 1, 1.0),
+(3, 2, 3.0),
+(1, 3, 0.5);
+
+-- Insertar datos en Production_Line
+INSERT INTO Production_Line (Liquid_Capacity, Solid_Capacity, Production_Factor)
+VALUES
+(1000, 500, 1.0),
+(2000, 1000, 1.0),
+(1500, 800, 1.0);
+
+select * from production_line
+
+-- Insertar datos en Workers
+INSERT INTO Workers (Name, UID, FK_Production_Line)
+VALUES
+('Juan Pérez', 'W001', 1),
+('Ana López', 'W002', 2),
+('Carlos Gómez', 'W003', 3),
+('María Rodríguez', 'W004', 1),
+('Andrés Martínez', 'W005', 1),
+('Santiago Arias', 'W006', 2);
