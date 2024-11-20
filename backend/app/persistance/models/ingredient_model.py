@@ -9,4 +9,5 @@ class Ingredient(Base):
     code = Column(String(50), unique=True, nullable=False)  
     available_units = Column(Integer, nullable=False)
     max_capacity = Column(Integer, nullable=False)
-    type=Column(String(50), nullable=False)
+    type = Column(String(50), nullable=False)
+

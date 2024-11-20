@@ -40,7 +40,7 @@ CREATE TABLE Supplier_Ingredient (
 );
 
 -- Crear tabla Recipe
-CREATE TABLE Recipe (
+CREATE TABLE Recipes (
     id SERIAL PRIMARY KEY,
     FK_Product INTEGER NOT NULL REFERENCES Products(id) ON DELETE CASCADE,
     Preparation_Time INTEGER NOT NULL
@@ -49,7 +49,7 @@ CREATE TABLE Recipe (
 -- Crear tabla Recipe_Ingredients (relación muchos a muchos)
 CREATE TABLE Recipe_Ingredients (
     FK_Ingredient INTEGER NOT NULL REFERENCES Ingredients(id) ON DELETE CASCADE,
-    FK_Recipe INTEGER NOT NULL REFERENCES Recipe(id) ON DELETE CASCADE,
+    FK_Recipe INTEGER NOT NULL REFERENCES Recipes(id) ON DELETE CASCADE,
     Quantity FLOAT NOT NULL,
     PRIMARY KEY (FK_Ingredient, FK_Recipe)
 );
