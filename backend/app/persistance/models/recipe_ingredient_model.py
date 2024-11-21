@@ -5,7 +5,7 @@ from app.config import Base
 class RecipeIngredients(Base): 
     __tablename__ = 'recipe_ingredients'
     
-    fk_recipe = Column(Integer, ForeignKey('recipe.id'), primary_key=True)
+    fk_recipe = Column(Integer, ForeignKey('recipes.id'), primary_key=True)
     fk_ingredient = Column(Integer, ForeignKey('ingredients.id'), primary_key=True)
     quantity = Column(Integer, nullable=False)
 

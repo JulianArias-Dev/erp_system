@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from app.config import Base
 
 class Recipe(Base):
-    __tablename__ = 'recipe'
+    __tablename__ = 'recipes'
 
     id = Column(Integer, primary_key=True, index=True)
     fk_product = Column(Integer, ForeignKey('products.id'), nullable=False)

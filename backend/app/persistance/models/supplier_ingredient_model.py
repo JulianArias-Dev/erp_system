@@ -3,9 +3,9 @@ from sqlalchemy.orm import relationship
 from app.config import Base
 
 class SupplierIngredient(Base):
-    __tablename__ = "supplier_ingredient"
+    __tablename__ = "supplier_ingredients"
 
-    fk_supplier = Column(Integer, ForeignKey("supplier.id"), primary_key=True)
+    fk_supplier = Column(Integer, ForeignKey("suppliers.id"), primary_key=True)
     fk_ingredient = Column(Integer, ForeignKey("ingredients.id"), primary_key=True)
     quantity = Column(Integer, nullable=False)
     price = Column(Float, nullable=False)

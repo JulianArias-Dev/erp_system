@@ -3,7 +3,7 @@ from sqlalchemy.orm import relationship
 from app.config import Base
 
 class Supplier(Base):
-    __tablename__ = "supplier"
+    __tablename__ = "suppliers"
     
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
