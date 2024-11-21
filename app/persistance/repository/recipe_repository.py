@@ -1,9 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status   
-from app.persistance.models.recipe_model import Recipe
-from app.persistance.models.recipe_ingredient_model import RecipeIngredients
-from app.persistance.models.ingredient_model import Ingredient
-from app.persistance.models.product_model import Product
+from app.persistance.models import Recipe, RecipeIngredients, Ingredient, Product
 from typing import List
 
 def get_all_recipes(db: Session):

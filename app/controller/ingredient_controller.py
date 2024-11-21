@@ -13,12 +13,16 @@ def create_ingredient(ingredient: IngredientCreate, db: Session = Depends(get_db
     """
     return ingredient_service.create_ingredient(db, ingredient)
 
-@router.get("/", response_model=list[IngredientResponse])
+from fastapi.responses import JSONResponse
+
+@router.get("/", response_model=dict)
 def list_ingredients(db: Session = Depends(get_db)):
     """
-    Endpoint para obtener todos los ingredientes.
+    Endpoint para obtener todos los ingredientes en formato JSON.
     """
-    return ingredient_service.list_ingredients(db)
+    ingredients = ingredient_service.list_ingredients(db)
+    return JSONResponse(content={"ingredients": ingredients})
+
 
 @router.get("/{code}", response_model=IngredientResponse)
 def get_ingredient_by_code(code: str, db: Session = Depends(get_db)):

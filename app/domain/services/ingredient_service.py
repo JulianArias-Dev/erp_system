@@ -7,8 +7,19 @@ def create_ingredient(db: Session, ingredient: IngredientCreate):
     return ingredient_repository.create_ingrediet(db, ingredient)
 
 def list_ingredients(db: Session):
-    """Devuelve una lista de todos los ingredientes."""
-    return ingredient_repository.get_ingredients(db)
+    """Devuelve una lista de todos los ingredientes en formato JSON."""
+    ingredients = ingredient_repository.get_ingredients(db)
+    return [
+        {
+            "id": ingredient.id,
+            "name": ingredient.name,
+            "code": ingredient.code,
+            "available_units": ingredient.available_units,
+            "max_capacity": ingredient.max_capacity,
+            "type": ingredient.type,
+        }
+        for ingredient in ingredients
+    ]
 
 def update_ingredient(db: Session, id_ingredient: int, new_ingredient: IngredientCreate):
     """Actualiza un ingrediente existente."""

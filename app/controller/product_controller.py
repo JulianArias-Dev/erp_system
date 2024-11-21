@@ -13,12 +13,16 @@ def create_product(product: ProductCreate, db: Session = Depends(get_db)):
     """
     return product_service.create_product(db, product)
 
-@router.get("/", response_model=list[ProductResponse])
+from fastapi.responses import JSONResponse
+
+@router.get("/", response_model=dict)
 def list_products(db: Session = Depends(get_db)):
     """
-    Endpoint para obtener todos los productos.
+    Endpoint para obtener todos los productos en formato JSON.
     """
-    return product_service.list_products(db)
+    products = product_service.list_products(db)
+    return JSONResponse(content={"products": products})
+
 
 @router.get("/{code}", response_model=ProductResponse)
 def get_product_by_code(code: str, db: Session = Depends(get_db)):
