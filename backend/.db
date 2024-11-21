@@ -24,15 +24,15 @@ CREATE TABLE Ingredients (
 );
 
 -- Crear tabla Supplier
-CREATE TABLE Supplier (
+CREATE TABLE Suppliers (
     id SERIAL PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
     Contact VARCHAR(255) NOT NULL
 );
 
 -- Crear tabla Supplier_Ingredient (relación muchos a muchos)
-CREATE TABLE Supplier_Ingredient (
-    FK_Supplier INTEGER NOT NULL REFERENCES Supplier(id) ON DELETE CASCADE,
+CREATE TABLE Supplier_Ingredients (
+    FK_Supplier INTEGER NOT NULL REFERENCES Suppliers(id) ON DELETE CASCADE,
     FK_Ingredient INTEGER NOT NULL REFERENCES Ingredients(id) ON DELETE CASCADE,
     Quantity INTEGER NOT NULL,
     Price FLOAT NOT NULL,
@@ -54,8 +54,8 @@ CREATE TABLE Recipe_Ingredients (
     PRIMARY KEY (FK_Ingredient, FK_Recipe)
 );
 
--- Crear tabla Production_Line
-CREATE TABLE Production_Line (
+-- Crear tabla Production_Lines
+CREATE TABLE Production_Lines (
     id SERIAL PRIMARY KEY,
     Liquid_Capacity FLOAT NOT NULL,
     Solid_Capacity FLOAT NOT NULL,
@@ -155,14 +155,14 @@ VALUES
 ('Ingrediente Z', 'I003', 1500, 7000, 'Líquido');
 
 -- Insertar datos en Supplier
-INSERT INTO Supplier (Name, Contact)
+INSERT INTO Suppliers (Name, Contact)
 VALUES
 ('Proveedor A', 'proveedora@example.com'),
 ('Proveedor B', 'proveedorb@example.com'),
 ('Proveedor C', 'proveedorc@example.com');
 
 -- Insertar datos en Supplier_Ingredient
-INSERT INTO Supplier_Ingredient (FK_Supplier, FK_Ingredient, Quantity, Price)
+INSERT INTO Supplier_Ingredients (FK_Supplier, FK_Ingredient, Quantity, Price)
 VALUES
 (1, 1, 500, 1.2),
 (1, 2, 300, 2.0),
@@ -170,7 +170,7 @@ VALUES
 (3, 1, 400, 1.1);
 
 -- Insertar datos en Recipe
-INSERT INTO Recipe (FK_Product, Preparation_Time)
+INSERT INTO Recipes (FK_Product, Preparation_Time)
 VALUES
 (1, 60),
 (2, 45),
@@ -185,13 +185,11 @@ VALUES
 (1, 3, 0.5);
 
 -- Insertar datos en Production_Line
-INSERT INTO Production_Line (Liquid_Capacity, Solid_Capacity, Production_Factor)
+INSERT INTO Production_Lines (Liquid_Capacity, Solid_Capacity, Production_Factor)
 VALUES
 (1000, 500, 1.0),
 (2000, 1000, 1.0),
 (1500, 800, 1.0);
-
-select * from production_line
 
 -- Insertar datos en Workers
 INSERT INTO Workers (Name, UID, FK_Production_Line)
