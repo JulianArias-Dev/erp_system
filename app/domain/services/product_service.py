@@ -7,8 +7,19 @@ def create_product(db: Session, product: ProductCreate):
     return product_repository.create_product(db, product)
 
 def list_products(db: Session):
-    """Devuelve una lista de todos los productos."""
-    return product_repository.get_products(db)
+    """Devuelve una lista de todos los productos en formato JSON."""
+    products = product_repository.get_products(db)
+    return [
+        {
+            "id": product.id,
+            "code": product.code,
+            "name": product.name,
+            "unit_price": product.unit_price,
+            "available_units": product.available_units,
+            "max_capacity": product.max_capacity,
+        }
+        for product in products
+    ]
 
 def update_product(db: Session, id_product: int, new_product: ProductCreate):
     """Actualiza un producto existente."""

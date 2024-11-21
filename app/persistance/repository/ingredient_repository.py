@@ -33,7 +33,13 @@ def get_ingredients(db: Session):
 
 def get_ingredient_by_code(db: Session, code: str):
     """Obtiene un ingrediente por su código."""
-    return db.query(Ingredient).filter(Ingredient.code == code).first()
+    ingredient = db.query(Ingredient).filter(Ingredient.code == code).first()
+    if not ingredient:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Ingredient with code '{code}' not found."
+        )
+    return ingredient
 
 def update_ingredient(db: Session, id_ingredient: int, new_ingredient: IngredientCreate):
     """Actualiza los datos de un ingrediente existente."""
