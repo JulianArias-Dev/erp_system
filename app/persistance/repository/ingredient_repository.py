@@ -60,3 +60,31 @@ def delete_ingredient(db: Session, id_ingredient: int):
     db.delete(ingredient)
     db.commit()
     return True
+
+def update_stock(db: Session, id_ingredient: int, quantity: float):
+    """Actualizar el stock de un ingrediente."""
+    # Validar cantidad positiva
+    if quantity <= 0:
+        raise ValueError("La cantidad debe ser mayor a 0.")
+    
+    # Consultar el ingrediente
+    ingredient = db.query(Ingredient).filter(Ingredient.id == id_ingredient).first()
+    if not ingredient:
+        raise ValueError(f"No se encontró el ingrediente con id {id_ingredient}.")
+    
+    # Calcular el nuevo stock
+    new_stock = ingredient.available_units + quantity
+    
+    # Validar que no exceda la capacidad máxima
+    if new_stock > ingredient.max_capacity:
+        raise ValueError(
+            f"La compra excede la capacidad máxima. "
+            f"Stock actual: {ingredient.available_units}, Capacidad máxima: {ingredient.max_capacity}, "
+            f"Cantidad solicitada: {quantity}"
+        )
+    
+    # Actualizar el stock
+    ingredient.available_units = new_stock
+    db.commit()
+    db.refresh(ingredient)
+    return ingredient

@@ -200,3 +200,9 @@ VALUES
 ('María Rodríguez', 'W004', 1),
 ('Andrés Martínez', 'W005', 1),
 ('Santiago Arias', 'W006', 2);
+
+--Tabla para generar fechas de compra
+CREATE TABLE dates (
+    name VARCHAR(50) PRIMARY KEY,
+    date TIMESTAMP NOT NULL
+);
