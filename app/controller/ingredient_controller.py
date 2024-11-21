@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.config import get_db
 from app.domain.schemas.ingredient_schema import IngredientCreate, IngredientResponse
+from app.domain.schemas.purchase_ingredient_schema import PurchaseIngredientCreate
 from app.domain.services import ingredient_service
 from fastapi.responses import JSONResponse
 
@@ -66,3 +67,22 @@ def delete_ingredient(id_ingredient: int, db: Session = Depends(get_db)):
             detail="Error deleting ingredient: ingredient not found"
         )
     return JSONResponse(content={"message": "Ingredient deleted successfully"})
+
+@router.post('/purchase', response_model=dict)
+def register_purchase(purchase: PurchaseIngredientCreate, db: Session = Depends(get_db)):
+    """
+    Endpoint para registrar compras - Actualizar stock y enviar reporte a Finanzas.
+    """
+    try:
+        # Llamada al servicio para registrar la compra
+        data = ingredient_service.ingredient_purchase(db, purchase)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(e)
+        )
+
+    return JSONResponse(
+        {"message": "Purchase registered successfully", "data": data},
+        status_code=status.HTTP_201_CREATED
+    )

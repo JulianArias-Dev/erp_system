@@ -57,7 +57,6 @@ def get_supplier_by_id(db: Session, supplier_id: int):
         "ingredients": ingredients,
     }
 
-
 def create_supplier(db: Session, supplier: SupplierCreate):
     """
     Crea un nuevo proveedor.
@@ -132,8 +131,6 @@ def add_ingredient_to_supplier(db: Session, supplier_id: int, ingredient: Suppli
         "price": supplier_ingredient.price,
     }
 
-
-
 def remove_ingredient_from_supplier(db: Session, supplier_id: int, ingredient_id: int):
     """
     Elimina un ingrediente asociado a un proveedor.
@@ -150,3 +147,19 @@ def remove_ingredient_from_supplier(db: Session, supplier_id: int, ingredient_id
     # Eliminar la relación
     db.delete(supplier_ingredient)
     db.commit()
+
+def validateRelationShip(db:Session, supplier_id: int, ingredient_id: int):
+    supplier_ingredient = (
+        db.query(SupplierIngredient)
+        .filter(SupplierIngredient.fk_supplier == supplier_id, SupplierIngredient.fk_ingredient == ingredient_id)
+        .first()
+    )
+    if not supplier_ingredient:
+        raise ValueError("Ingredient not associated with supplier")
+    return True
+
+def get_supplier_toName(db: Session, supplier_id: int): 
+    supplier = db.query(Supplier).filter(Supplier.id == supplier_id).first()
+    if not supplier :
+        raise ValueError("Supplier don't exist")
+    return supplier
