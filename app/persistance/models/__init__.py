@@ -4,7 +4,8 @@ from .recipe_model import Recipe
 from .recipe_ingredient_model import RecipeIngredients
 from .supplier_model import Supplier
 from .supplier_ingredient_model import SupplierIngredient
-
+from .production_line_model import ProductionLine
+from .worker_model import Worker
 
 # Define los modelos que se exportan al importar este módulo
-__all__ = ["Product","Ingredient", "Supplier","Recipe", "RecipeIngredients" "SupplierIngredient"]
+__all__ = ["Product","Ingredient", "Supplier","Recipe", "RecipeIngredients","SupplierIngredient", "ProductionLine", "Worker"]

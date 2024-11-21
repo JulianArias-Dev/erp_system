@@ -77,7 +77,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     -- Verifica si el trabajador está asociado a una línea de producción
     IF NEW.FK_Production_Line IS NOT NULL THEN
-        UPDATE Production_Line
+        UPDATE Production_Lines
         SET Production_Factor = Production_Factor - 0.1
         WHERE id = NEW.FK_Production_Line;
     END IF;
@@ -91,7 +91,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     -- Verifica si el trabajador estaba asociado a una línea de producción
     IF OLD.FK_Production_Line IS NOT NULL THEN
-        UPDATE Production_Line
+        UPDATE Production_Lines
         SET Production_Factor = Production_Factor + 0.1
         WHERE id = OLD.FK_Production_Line;
     END IF;
