@@ -22,10 +22,7 @@ def create_ingredient(db:Session, ingredient:IngredientCreate):
     db.add(db_ingredient)
     db.commit()
     db.refresh(db_ingredient)
-    return {
-        "message" : "Ingredient created succesfully!",
-        "ingredient" : IngredientResponse.from_orm(db_ingredient),
-        }
+    return db_ingredient
     
 def get_ingredients(db: Session):
     """Obtiene todos los ingredientes."""
@@ -53,10 +50,7 @@ def update_ingredient(db: Session, id_ingredient: int, new_ingredient: Ingredien
     ingredient.type=new_ingredient.type
     db.commit()
     db.refresh(ingredient)
-    return {
-        "message" : "Ingredient updated succesfully!",
-        "ingredient" : IngredientResponse.from_orm(ingredient)
-        }
+    return ingredient
 
 def delete_ingredient(db: Session, id_ingredient: int):
     """Elimina un ingrediente por su ID."""
