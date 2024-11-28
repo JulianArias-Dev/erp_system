@@ -70,6 +70,14 @@ CREATE TABLE Workers (
     FK_Production_Line INTEGER NOT NULL REFERENCES Production_Line(id) ON DELETE SET NULL
 );
 
+-- Crear tabla Orders
+CREATE TABLE Orders (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER NOT NULL REFERENCES Products(id) ON DELETE CASCADE,
+    quantity INTEGER NOT NULL,
+    date DATE NOT NULL
+);
+
 --Triggers and Functions
 -- Crear función para reducir el Production_Factor al insertar un trabajador
 CREATE OR REPLACE FUNCTION reduce_production_factor()
@@ -206,3 +214,12 @@ CREATE TABLE dates (
     name VARCHAR(50) PRIMARY KEY,
     date TIMESTAMP NOT NULL
 );
+
+-- Insertar datos en Orders
+INSERT INTO orders (product_id, quantity, date)
+VALUES 
+    (4, 200, '2024-11-27'), 
+    (5, 120, '2024-11-24'),
+    (4, 200, '2024-11-27'), 
+    (5, 120, '2024-11-24'),
+    (6, 130, '2024-11-24');

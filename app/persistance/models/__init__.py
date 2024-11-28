@@ -7,6 +7,7 @@ from .supplier_ingredient_model import SupplierIngredient
 from .production_line_model import ProductionLine
 from .worker_model import Worker
 from .date_entry_model import DateEntry
+from .orders_model import Order
 
 # Define los modelos que se exportan al importar este módulo
-__all__ = ["Product","Ingredient", "Supplier","Recipe", "RecipeIngredients","SupplierIngredient", "ProductionLine", "Worker", "DateEntry"]
+__all__ = ["Product","Ingredient", "Supplier","Recipe", "RecipeIngredients","SupplierIngredient", "ProductionLine", "Worker", "DateEntry", "Order"]

@@ -47,18 +47,3 @@ def delete_product(db: Session, id_product: int):
     db.commit()
     return True
 
-def send_out_product(code: str, sold_quantity: int, db: Session):
-    """
-    Actualiza el stock después de una venta, permitiendo inventario negativo.
-    """
-    product = db.query(Product).filter(Product.code == code).first()
-
-    if not product:
-        return None
-
-    product.available_units -= sold_quantity
-
-    db.commit()
-    db.refresh(product)
-    return product
-    

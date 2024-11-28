@@ -60,34 +60,3 @@ def update_product(db: Session, id_product: int, new_product: ProductCreate):
 def delete_product(db: Session, id_product: int):
     """Elimina un producto por su ID."""
     return product_repository.delete_product(db, id_product)
-
-def sold_product(product_code: str, sold_quantity: int, db: Session):
-    """
-    Simula la venta de un producto y actualiza el stock.
-    """
-    if sold_quantity <= 0:
-        raise ValueError("Sold quantity must be greater than zero.")
-
-    product = product_repository.send_out_product(product_code, sold_quantity, db)
-
-    if not product:
-        raise ValueError("Product not found.")
-    if product.available_units < 0:
-        return {
-            "id": product.id,
-            "code": product.code,
-            "name": product.name,
-            "unit_price": product.unit_price,
-            "available_units": product.available_units,
-            "max_capacity": product.max_capacity,
-            "warning": "Inventory is negative after this sale!"
-        }
-
-    return {
-        "id": product.id,
-        "code": product.code,
-        "name": product.name,
-        "unit_price": product.unit_price,
-        "available_units": product.available_units,
-        "max_capacity": product.max_capacity,
-    }
