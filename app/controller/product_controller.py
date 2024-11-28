@@ -67,23 +67,3 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
         )
     return JSONResponse(content={"message": "Product deleted successfully"})
 
-@router.put("/send-out/{product_code}:{sold_quantity}", response_model=dict)
-def send_out_product(product_code: str, sold_quantity: int, db: Session = Depends(get_db)):
-    """
-    Endpoint para simular el despacho de productos.
-    """
-    try:
-        sold_product = product_service.sold_product(product_code, sold_quantity, db)
-        return JSONResponse(
-            content={"message": "Sale successfully registered", "product": sold_product}
-        )
-    except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred"
-        )

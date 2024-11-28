@@ -14,3 +14,6 @@ class Product(Base):
 
    # Relación con Recipe
    recipe = relationship("Recipe", back_populates="product")
+   
+   # Relación con Order
+   orders = relationship("Order", back_populates="product")
