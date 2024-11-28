@@ -54,22 +54,6 @@ CREATE TABLE Recipe_Ingredients (
     PRIMARY KEY (FK_Ingredient, FK_Recipe)
 );
 
--- Crear tabla Production_Lines
-CREATE TABLE Production_Lines (
-    id SERIAL PRIMARY KEY,
-    Liquid_Capacity FLOAT NOT NULL,
-    Solid_Capacity FLOAT NOT NULL,
-    Production_Factor FLOAT NOT NULL
-);
-
--- Crear tabla Workers
-CREATE TABLE Workers (
-    id SERIAL PRIMARY KEY,
-    Name VARCHAR(255) NOT NULL,
-    UID VARCHAR(100) NOT NULL UNIQUE,
-    FK_Production_Line INTEGER NOT NULL REFERENCES Production_Line(id) ON DELETE SET NULL
-);
-
 -- Crear tabla Orders
 CREATE TABLE Orders (
     id SERIAL PRIMARY KEY,
@@ -78,74 +62,11 @@ CREATE TABLE Orders (
     date DATE NOT NULL
 );
 
---Triggers and Functions
--- Crear función para reducir el Production_Factor al insertar un trabajador
-CREATE OR REPLACE FUNCTION reduce_production_factor()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Verifica si el trabajador está asociado a una línea de producción
-    IF NEW.FK_Production_Line IS NOT NULL THEN
-        UPDATE Production_Lines
-        SET Production_Factor = Production_Factor - 0.1
-        WHERE id = NEW.FK_Production_Line;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Crear función para incrementar el Production_Factor al eliminar un trabajador
-CREATE OR REPLACE FUNCTION increase_production_factor()
-RETURNS TRIGGER AS $$
-BEGIN
-    -- Verifica si el trabajador estaba asociado a una línea de producción
-    IF OLD.FK_Production_Line IS NOT NULL THEN
-        UPDATE Production_Lines
-        SET Production_Factor = Production_Factor + 0.1
-        WHERE id = OLD.FK_Production_Line;
-    END IF;
-    RETURN OLD;
-END;
-$$ LANGUAGE plpgsql;
-
--- Crear trigger para reducir Production_Factor en la inserción
-CREATE TRIGGER after_worker_insert
-AFTER INSERT ON Workers
-FOR EACH ROW
-EXECUTE FUNCTION reduce_production_factor();
-
--- Crear trigger para incrementar Production_Factor en la eliminación
-CREATE TRIGGER after_worker_delete
-AFTER DELETE ON Workers
-FOR EACH ROW
-EXECUTE FUNCTION increase_production_factor();
-
--- Crear función para validar que no haya más de 5 trabajadores por línea de producción
-CREATE OR REPLACE FUNCTION validate_worker_limit()
-RETURNS TRIGGER AS $$
-DECLARE
-    worker_count INTEGER;
-BEGIN
-    -- Verificar si el trabajador está asociado a una línea de producción
-    IF NEW.FK_Production_Line IS NOT NULL THEN
-        -- Contar los trabajadores actuales en la línea de producción
-        SELECT COUNT(*) INTO worker_count
-        FROM Workers
-        WHERE FK_Production_Line = NEW.FK_Production_Line;
-
-        -- Si ya hay 5 trabajadores, rechazar la operación
-        IF worker_count >= 5 THEN
-            RAISE EXCEPTION 'No se pueden asignar más de 5 trabajadores a la línea de producción con id %', NEW.FK_Production_Line;
-        END IF;
-    END IF;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Crear trigger para validar límite de trabajadores en la inserción
-CREATE TRIGGER validate_worker_limit_trigger
-BEFORE INSERT ON Workers
-FOR EACH ROW
-EXECUTE FUNCTION validate_worker_limit();
+--Tabla para generar fechas de compra
+CREATE TABLE dates (
+    name VARCHAR(50) PRIMARY KEY,
+    date TIMESTAMP NOT NULL
+);
 
 -- Test Data
 -- Insertar datos en Products
@@ -191,29 +112,6 @@ VALUES
 (2, 1, 1.0),
 (3, 2, 3.0),
 (1, 3, 0.5);
-
--- Insertar datos en Production_Line
-INSERT INTO Production_Lines (Liquid_Capacity, Solid_Capacity, Production_Factor)
-VALUES
-(1000, 500, 1.0),
-(2000, 1000, 1.0),
-(1500, 800, 1.0);
-
--- Insertar datos en Workers
-INSERT INTO Workers (Name, UID, FK_Production_Line)
-VALUES
-('Juan Pérez', 'W001', 1),
-('Ana López', 'W002', 2),
-('Carlos Gómez', 'W003', 3),
-('María Rodríguez', 'W004', 1),
-('Andrés Martínez', 'W005', 1),
-('Santiago Arias', 'W006', 2);
-
---Tabla para generar fechas de compra
-CREATE TABLE dates (
-    name VARCHAR(50) PRIMARY KEY,
-    date TIMESTAMP NOT NULL
-);
 
 -- Insertar datos en Orders
 INSERT INTO orders (product_id, quantity, date)
