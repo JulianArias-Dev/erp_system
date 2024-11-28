@@ -111,3 +111,7 @@ def delete_recipe(db: Session, recipe_id: int):
     db.delete(recipe)
     db.commit()
     return True
+
+
+def get_recipe_by_product_id(db: Session, product_id: int):
+    return db.query(Recipe).filter(Recipe.fk_product == product_id).first()

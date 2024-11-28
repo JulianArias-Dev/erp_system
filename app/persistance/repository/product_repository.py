@@ -24,6 +24,10 @@ def get_product_by_code(db: Session, code: str):
     """Obtiene un producto por su código."""
     return db.query(Product).filter(Product.code == code).first()
 
+def get_product_by_id(db: Session, id: int):
+    """Obtiene un producto por su código."""
+    return db.query(Product).filter(Product.id == id).first()
+
 def update_product(db: Session, id_product: int, new_product: ProductCreate):
     """Actualiza los datos de un producto existente."""
     product = db.query(Product).filter(Product.id == id_product).first()
