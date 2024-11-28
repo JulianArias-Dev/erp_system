@@ -40,3 +40,18 @@ def send_out_product(order: OrderRegister, db: Session = Depends(get_db)):
             detail="An unexpected error occurred"
         )
 
+
+@router.get("/grouped-order-by-products", response_model=list[dict])
+def get_grouped_products_with_orders(db: Session = Depends(get_db)):
+    """
+    Endpoint para obtener productos agrupados con fechas y cantidades.
+    """
+    try:
+        grouped_products = order_service.group_orders_by_product(db)
+        return grouped_products
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An error occurred while grouping products"
+        ) 
+
