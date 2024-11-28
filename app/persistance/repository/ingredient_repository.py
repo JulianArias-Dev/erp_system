@@ -30,7 +30,7 @@ def get_ingredients(db: Session):
 
 def get_ingredient_by_code(db: Session, code: str):
     """Obtiene un ingrediente por su código."""
-    ingredient = db.query(Ingredient).filter(Ingredient.code == code).first()
+    ingredient = db.query(Ingredient).filter(Ingredient.id == code).first()
     if not ingredient:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

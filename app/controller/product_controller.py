@@ -67,3 +67,24 @@ def delete_product(id_product: int, db: Session = Depends(get_db)):
         )
     return JSONResponse(content={"message": "Product deleted successfully"})
 
+@router.post("/production", response_model=dict, status_code=status.HTTP_202_ACCEPTED)
+def production_request_endpoint(product_id: int, quantity: int, db: Session = Depends(get_db)):
+    """
+    Endpoint para solicitar producción.
+    Llama al servicio que procesa la producción y maneja posibles errores.
+    """
+    try:
+        # Llamada al servicio de producción
+        result = product_service.production_request(product_id, quantity, db)
+        return result
+    except HTTPException as e:
+        # Re-lanza excepciones HTTP si fueron levantadas en el servicio
+        raise e
+    """ except Exception as e:
+        # Manejo genérico para errores inesperados
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error interno en el servidor. Por favor, intente más tarde."
+        ) """
+    
+    
