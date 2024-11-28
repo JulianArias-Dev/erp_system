@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.controller import product_controller, ingredient_controller, recipe_controller, supplier_controller, production_line_controller, worker_controller, order_controller
+from app.controller import product_controller, ingredient_controller, recipe_controller, supplier_controller, order_controller
 
 app = FastAPI()
 
@@ -18,6 +18,4 @@ app.include_router(product_controller.router)
 app.include_router(ingredient_controller.router)
 app.include_router(recipe_controller.router)
 app.include_router(supplier_controller.router)
-app.include_router(production_line_controller.router)
-app.include_router(worker_controller.router)
 app.include_router(order_controller.router)
