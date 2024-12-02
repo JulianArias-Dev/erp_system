@@ -76,12 +76,7 @@ def update_stock(db: Session, id_ingredient: int, quantity: float):
     new_stock = ingredient.available_units + quantity
     
     # Validar que no exceda la capacidad máxima
-    if new_stock > ingredient.max_capacity:
-        raise ValueError(
-            f"La compra excede la capacidad máxima. "
-            f"Stock actual: {ingredient.available_units}, Capacidad máxima: {ingredient.max_capacity}, "
-            f"Cantidad solicitada: {quantity}"
-        )
+    
     
     # Actualizar el stock
     ingredient.available_units = new_stock
