@@ -8,5 +8,5 @@ uvicorn app.main:app --reload
 >[!IMPORTANT]
 > Instalar los recursos necesarios con el comando
 > ```sh
-> 
+> pip install -r requirements.txt
 > ```
